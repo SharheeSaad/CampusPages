@@ -1,18 +1,18 @@
 Requirement_ID,Requirement_Description,Role,Use_Case_ID,DFD_Process,Database_Tables,Screen_Name,Code_Route,Test_Case_ID
-FR-01,Register and log in with role permissions,All,UC-01,Process 1.0,users,Login / Register,POST /auth/login,TC-01
-FR-02,Browse books by programme semester and course,Student,UC-02,Process 2.0,"courses, books, editions, course_books, stock",Catalogue,GET /catalogue,TC-02
-FR-03,Reserve full semester bundle in one step,Student,UC-03,Process 2.1,"reservations, reservation_items, stock, waitlist",Bundle Page,POST /bundle/reserve,TC-03
+FR-01,Register and log in with role permissions,All,UC-01,Process 1.0,"users, programmes",Login / Register,POST /auth/login,TC-01
+FR-02,Browse books by programme semester and course,Student,UC-02,Process 2.4,"courses, books, editions, course_books, stock",Catalogue,GET /catalogue,TC-02
+FR-03,Reserve full semester bundle in one step,Student,UC-03,Process 2.1,"reservations, reservation_items, stock, waitlist, course_books",Bundle Page,POST /bundle/reserve,TC-03
 FR-04,Join waitlist and receive restock notifications,Student,UC-04,Process 2.2,"waitlist, notifications",Book Detail / Notifications,POST /waitlist/join,TC-04
-FR-05,List a used course book for sale-back,Student,UC-05,Process 3.0,"used_listings, editions",Sell a Book,POST /used/list,TC-05
+FR-05,List a used course book for sale-back,Student,UC-05,Process 3.3,"used_listings, editions",Sell a Book,POST /used/list,TC-05
 FR-06,Reserve an available used copy,Student,UC-06,Process 3.1,"used_listings, reservations, reservation_items",Book Detail,POST /used/reserve,TC-06
-FR-07,Simulate mobile wallet payment or select cash at pickup,Student,UC-07,Process 4.0,"transactions, reservations",Checkout,POST /checkout/pay,TC-07
+FR-07,Simulate mobile wallet payment or select cash at pickup,Student,UC-07,Process 4.5,"transactions, reservations",Checkout,POST /checkout/pay,TC-07
 FR-08,Generate reservation pickup slip with QR code,Student,UC-08,Process 4.1,reservations,My Reservations,GET /reservations/slip/<id>,TC-08
 FR-09,Cancel active reservation and trigger refund record,Student,UC-09,Process 4.2,"reservations, transactions, stock, used_listings",My Reservations,POST /reservations/cancel,TC-09
 FR-10,Display also reserved recommendations by course cohort,Student,UC-10,Process 2.3,"course_books, reservations, reservation_items",Book Detail,GET /catalogue/recommendations,TC-10
 FR-11,Submit and confirm syllabus booklist and enrolment,Instructor,UC-11,Process 5.0,"course_books, editions, books",Booklist Form,POST /instructor/booklist,TC-11
-FR-12,Manage books editions pricing and base stock levels,Owner,UC-12,Process 6.0,"books, editions, stock",Catalogue Admin,POST /admin/catalog,TC-12
+FR-12,Manage books editions pricing and base stock levels,Owner,UC-12,Process 6.3,"books, editions, stock",Catalogue Admin,POST /admin/catalog,TC-12
 FR-13,Calculate demand forecast and suggested reorder quantities,Owner,UC-13,Process 6.1,"forecast_params, course_books, stock, used_listings",Forecast Page,GET /admin/forecast,TC-13
-FR-14,Inspect and verify used book listings and condition grade,Owner,UC-14,Process 3.2,used_listings,Used-Book Intake,POST /admin/used/verify,TC-14
+FR-14,Inspect and verify used book listings and condition grade,Owner,UC-14,Process 3.2,"used_listings, notifications",Used-Book Intake,POST /admin/used/verify,TC-14
 FR-15,Verify pickup via QR code and record cash settlements,Owner,UC-15,Process 4.3,"reservations, transactions, stock, used_listings",Pickup Desk,POST /admin/pickup/verify,TC-15
-FR-16,View analytics dashboard on reorders and reservations,Owner,UC-16,Process 6.2,"reservations, course_books, stock",Dashboard,GET /admin/dashboard,TC-16
+FR-16,View analytics dashboard on reorders and reservations,Owner,UC-16,Process 6.2,"reservations, reservation_items, transactions, stock",Dashboard,GET /admin/dashboard,TC-16
 FR-17,Audit financial transactions and disburse seller payouts,Owner,UC-17,Process 4.4,"transactions, used_listings",Transactions Admin,POST /admin/payout,TC-17
