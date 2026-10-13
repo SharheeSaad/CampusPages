@@ -15,8 +15,7 @@ CampusPages is an academic web platform designed to streamline course textbook a
 * **Amaan Ahmad** (ID: 1702300064) — Survey Research, UI/UX & Documentation
 * **Md. Aminur Rahman Eusha** (ID: 1702400154) — Testing, Quality Assurance & Data Modeling
 
-**Course Lecturer:** Rokeya Akanda Sriti  
-**Course Code:** BIC3203
+
 
 ---
 
