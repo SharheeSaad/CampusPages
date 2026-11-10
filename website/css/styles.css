@@ -1,5 +1,6 @@
 /* =====================================================================
    CampusPages Custom Styles
+   Enhanced with Dark Mode & Dynamic Accessibility
    ===================================================================== */
 
 /* Subtle transitions & animations */
@@ -33,7 +34,7 @@
   }
 }
 
-/* Custom scrollbars */
+/* Custom scrollbars - Light & Dark */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -49,11 +50,24 @@
   background: #94a3b8;
 }
 
+html.dark ::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
 /* Glassmorphism utility */
 .glass-panel {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+}
+html.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.85);
 }
 
 /* Interactive card hover */
@@ -63,6 +77,9 @@
 .book-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+}
+html.dark .book-card:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
 }
 
 /* QR Code Display Container */

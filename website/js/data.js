@@ -8,6 +8,8 @@ const STORAGE_KEY = 'campuspages_db_state_v1';
 const INITIAL_SEED_DATA = {
   role: 'student',
   activeSemester: 4,
+  totalSemesters: 6, // Configurable by Admin / Store Owner
+  theme: 'light',     // 'light' or 'dark'
   activeProgrammeId: 1, // Default BCS
   forecastParams: {
     buyRate: 0.650,
@@ -282,7 +284,14 @@ class StateManager {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        // Ensure new schema keys exist
+        if (!parsed.totalSemesters) parsed.totalSemesters = 6;
+        if (!parsed.theme) parsed.theme = 'light';
+        if (!parsed.programmes || parsed.programmes.length === 0) {
+          parsed.programmes = JSON.parse(JSON.stringify(INITIAL_SEED_DATA.programmes));
+        }
+        return parsed;
       }
     } catch (e) {
       console.warn('Could not read from localStorage, using initial seed data.', e);
