@@ -3,6 +3,7 @@
 -- Target DBMS : MySQL Community Server 8.0.16+ (CHECK constraints enforced)
 -- Design      : 14 tables, 3NF (one controlled 2NF exception: course_books.expected_enrolment)
 -- Run order   : schema.sql first, then seed.sql
+-- =====================================================================
 
 DROP DATABASE IF EXISTS campuspages_db;
 CREATE DATABASE campuspages_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -46,14 +47,18 @@ CREATE TABLE users (
 ) ENGINE=InnoDB;
 
 -- 4. courses (D2 Academic Catalogue)
+-- Unique per programme so shared foundation modules (e.g. BIC1114) can exist across degrees
 CREATE TABLE courses (
     course_id INT AUTO_INCREMENT PRIMARY KEY,
     programme_id INT NOT NULL,
-    course_code VARCHAR(20) NOT NULL UNIQUE,
+    course_code VARCHAR(20) NOT NULL,
     title VARCHAR(150) NOT NULL,
     semester_no INT NOT NULL,
+    credits INT NOT NULL DEFAULT 3,
     CONSTRAINT fk_courses_programme FOREIGN KEY (programme_id) REFERENCES programmes(programme_id) ON DELETE CASCADE,
-    CONSTRAINT ck_courses_semester CHECK (semester_no >= 1 AND semester_no <= 12)
+    CONSTRAINT ck_courses_semester CHECK (semester_no >= 1 AND semester_no <= 12),
+    CONSTRAINT ck_courses_credits CHECK (credits > 0 AND credits <= 10),
+    CONSTRAINT uq_programme_course UNIQUE (programme_id, course_code)
 ) ENGINE=InnoDB;
 
 -- 5. books (D2 Academic Catalogue)
