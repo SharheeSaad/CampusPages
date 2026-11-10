@@ -175,6 +175,7 @@ function switchRole(newRole) {
   if (newRole === 'student') {
     renderProgramSelect();
     renderSemesterPills();
+    renderCourseSearchDatalist();
     renderStudentCatalog();
     renderBundleHero();
   } else if (newRole === 'instructor') {
@@ -268,6 +269,61 @@ function handleGlobalSearch() {
   renderStudentCatalog();
 }
 
+// Course Search inside Program Filter Section
+function handleCourseFilterSearch() {
+  const input = document.getElementById('courseFilterSearch');
+  const clearBtn = document.getElementById('clearCourseFilterBtn');
+  if (input && clearBtn) {
+    if (input.value.trim().length > 0) {
+      clearBtn.classList.remove('hidden');
+    } else {
+      clearBtn.classList.add('hidden');
+    }
+  }
+  renderStudentCatalog();
+}
+
+function clearCourseFilterSearch() {
+  const input = document.getElementById('courseFilterSearch');
+  const clearBtn = document.getElementById('clearCourseFilterBtn');
+  if (input) input.value = '';
+  if (clearBtn) clearBtn.classList.add('hidden');
+  renderStudentCatalog();
+}
+
+function renderCourseSearchDatalist() {
+  const state = getState();
+  const datalist = document.getElementById('courseSearchDatalist');
+  if (!datalist) return;
+
+  datalist.innerHTML = '';
+  const seenCodes = new Set();
+  state.books.forEach((b) => {
+    if (!seenCodes.has(b.courseCode)) {
+      seenCodes.add(b.courseCode);
+      const opt = document.createElement('option');
+      opt.value = b.courseCode;
+      opt.label = `${b.courseCode} - ${b.courseTitle}`;
+      datalist.appendChild(opt);
+
+      const optTitle = document.createElement('option');
+      optTitle.value = b.courseTitle;
+      optTitle.label = `${b.courseCode}: ${b.courseTitle}`;
+      datalist.appendChild(optTitle);
+    }
+  });
+
+  state.courses.forEach((c) => {
+    if (!seenCodes.has(c.code)) {
+      seenCodes.add(c.code);
+      const opt = document.createElement('option');
+      opt.value = c.code;
+      opt.label = `${c.code} - ${c.title}`;
+      datalist.appendChild(opt);
+    }
+  });
+}
+
 // 1-Click Semester Bundle Hero Banner
 function renderBundleHero() {
   const state = getState();
@@ -302,19 +358,35 @@ function renderStudentCatalog() {
   const state = getState();
   const grid = document.getElementById('studentBookGrid');
   const searchInput = document.getElementById('globalSearch');
+  const courseFilterSearch = document.getElementById('courseFilterSearch');
   const progSelect = document.getElementById('studentProgrammeSelect');
 
   if (!grid) return;
   grid.innerHTML = '';
 
   const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+  const courseQuery = courseFilterSearch ? courseFilterSearch.value.trim().toLowerCase() : '';
   const progId = progSelect ? parseInt(progSelect.value, 10) : state.activeProgrammeId || 1;
   const activeSem = state.activeSemester;
 
   const filteredBooks = state.books.filter((b) => {
-    const matchProg = b.programmeId === progId;
-    const matchSem = activeSem === 'all' || b.semester === activeSem;
-    const matchQuery =
+    // 1. Course Search Filter (course code, e.g. BIC3203, or course name, e.g. Business Case)
+    const matchCourse =
+      !courseQuery ||
+      b.courseCode.toLowerCase().includes(courseQuery) ||
+      b.courseTitle.toLowerCase().includes(courseQuery) ||
+      b.title.toLowerCase().includes(courseQuery);
+
+    // 2. Program filter: if courseQuery is typed, allow matching across program if courseCode matches
+    const matchProg = !courseQuery
+      ? (b.programmeId === progId)
+      : (b.programmeId === progId || b.courseCode.toLowerCase().includes(courseQuery));
+
+    // 3. Semester filter: if user explicitly typed a course query, do not restrict by semester pill
+    const matchSem = !courseQuery ? (activeSem === 'all' || b.semester === activeSem) : true;
+
+    // 4. Global header search filter
+    const matchGlobal =
       !query ||
       b.title.toLowerCase().includes(query) ||
       b.author.toLowerCase().includes(query) ||
@@ -322,12 +394,16 @@ function renderStudentCatalog() {
       b.courseTitle.toLowerCase().includes(query) ||
       b.isbn.toLowerCase().includes(query);
 
-    return matchProg && matchSem && matchQuery;
+    return matchCourse && matchProg && matchSem && matchGlobal;
   });
 
   const countBadge = document.getElementById('catalogBookCount');
   if (countBadge) {
-    countBadge.innerText = `Showing ${filteredBooks.length} syllabus ${filteredBooks.length === 1 ? 'title' : 'titles'}`;
+    if (courseQuery) {
+      countBadge.innerHTML = `Showing <strong>${filteredBooks.length}</strong> book${filteredBooks.length === 1 ? '' : 's'} for course "<strong>${courseFilterSearch.value.trim()}</strong>"`;
+    } else {
+      countBadge.innerText = `Showing ${filteredBooks.length} syllabus ${filteredBooks.length === 1 ? 'title' : 'titles'}`;
+    }
   }
 
   if (filteredBooks.length === 0) {
@@ -336,9 +412,11 @@ function renderStudentCatalog() {
         <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto text-xl font-bold">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
         </div>
-        <h4 class="font-bold text-slate-800 dark:text-white text-base">No Textbooks Found</h4>
-        <p class="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">No course books match the selected program or search filter. Try choosing "All" or another semester.</p>
-        <button onclick="resetFilters()" class="px-4 py-2 bg-blue-50 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-slate-600 text-blue-700 dark:text-blue-300 font-bold text-xs rounded-xl transition-all">Reset All Filters</button>
+        <h4 class="font-bold text-slate-800 dark:text-white text-base">No Books Found for this Course</h4>
+        <p class="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+          ${courseQuery ? `No textbook registered under course code or name matching "<strong>${courseFilterSearch.value.trim()}</strong>".` : 'No course books match the selected program or search filter. Try choosing "All" or another semester.'}
+        </p>
+        <button onclick="resetFilters()" class="px-4 py-2 bg-blue-50 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-slate-600 text-blue-700 dark:text-blue-300 font-bold text-xs rounded-xl transition-all">Clear Filters & Show All</button>
       </div>
     `;
     return;
@@ -477,6 +555,7 @@ function renderStudentCatalog() {
 function resetFilters() {
   const searchInput = document.getElementById('globalSearch');
   if (searchInput) searchInput.value = '';
+  clearCourseFilterSearch();
   filterSemester(4);
 }
 
@@ -1860,6 +1939,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // 3. Render dynamic selects & pills
   renderProgramSelect();
   renderSemesterPills();
+  renderCourseSearchDatalist();
 
   // 4. Render main views
   renderStudentCatalog();
