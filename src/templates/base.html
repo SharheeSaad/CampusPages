@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CampusPages{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col font-sans">
+    <nav class="bg-indigo-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
+            <a href="/" class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                <span>📚</span> CampusPages
+            </a>
+            <div class="flex items-center space-x-4 text-sm font-medium">
+                {% if session.get('user_id') %}
+                    <span class="text-indigo-200">Hello, {{ session.get('full_name') }} ({{ session.get('role')|capitalize }})</span>
+                    <a href="/logout" class="bg-indigo-800 hover:bg-indigo-700 px-3 py-1.5 rounded-md transition">Logout</a>
+                {% else %}
+                    <a href="/login" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-md transition">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 p-4 rounded-md text-sm {% if category == 'error' %}bg-rose-100 text-rose-800 border border-rose-300{% else %}bg-emerald-100 text-emerald-800 border border-emerald-300{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        CampusPages &copy; 2026 UCSI University. All rights reserved.
+    </footer>
+</body>
+</html>
